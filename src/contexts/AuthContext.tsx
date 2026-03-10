@@ -19,12 +19,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const initAuth = async () => {
+      // Check for magic link token in URL (passed from platform)
+      const params = new URLSearchParams(window.location.search)
+      const tokenHash = params.get('token_hash')
+
+      if (tokenHash) {
+        // Verify the magic link token to establish session
+        const { data, error } = await supabase.auth.verifyOtp({
+          token_hash: tokenHash,
+          type: 'magiclink'
+        })
+
+        if (!error && data.session) {
+          setSession(data.session)
+          setUser(data.session.user)
+        } else {
+          console.error('Failed to verify onboarding token:', error)
+        }
+        // Clean URL
+        window.history.replaceState({}, '', window.location.pathname)
+        setLoading(false)
+        return
+      }
+
+      // Get existing session
+      const { data: { session } } = await supabase.auth.getSession()
       setSession(session)
       setUser(session?.user ?? null)
       setLoading(false)
-    })
+    }
+
+    initAuth()
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
