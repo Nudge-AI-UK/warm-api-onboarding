@@ -19,12 +19,12 @@ const API_BASE = 'https://api.warmai.uk/functions/v1'
 
 const endpointConfig = {
   waterfall: {
-    name: 'ip-company',
+    name: 'ip-to-company',
     title: 'Waterfall Lookup',
     description: 'Queries multiple providers, scores results by confidence, and returns the best match with source attribution.',
     icon: Zap,
-    credits: '1 credit per lookup',
-    endpoint: 'ip-company',
+    credits: '2 credits per lookup',
+    endpoint: 'ip-to-company',
     color: 'blue'
   },
   aggregate: {
@@ -32,7 +32,7 @@ const endpointConfig = {
     title: 'Aggregate Lookup',
     description: 'Queries all providers and combines results for maximum accuracy and data coverage.',
     icon: Layers,
-    credits: '3 credits per lookup',
+    credits: '5 credits per lookup',
     endpoint: 'ip-to-best-fit',
     color: 'purple'
   }
@@ -178,14 +178,14 @@ print(data)`
       // Waterfall (ip-company)
       switch (codeLanguage) {
         case 'curl':
-          return `curl -X POST "${API_BASE}/ip-company" \\
+          return `curl -X POST "${API_BASE}/ip-to-company" \\
   -H "Content-Type: application/json" \\
   -H "x-access-key: ${keyId}" \\
   -d '{
     "ip": "${testIp}"
   }'`
         case 'node':
-          return `const response = await fetch('${API_BASE}/ip-company', {
+          return `const response = await fetch('${API_BASE}/ip-to-company', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -203,7 +203,7 @@ console.log(data)
           return `import requests
 
 response = requests.post(
-    '${API_BASE}/ip-company',
+    '${API_BASE}/ip-to-company',
     headers={
         'Content-Type': 'application/json',
         'x-access-key': '${keyId}'

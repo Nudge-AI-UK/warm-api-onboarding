@@ -6,7 +6,7 @@ import { Zap, Layers, ChevronRight, ChevronLeft, ExternalLink } from 'lucide-rea
 const endpoints = [
   {
     id: 'waterfall',
-    name: 'ip-company',
+    name: 'ip-to-company',
     title: 'Waterfall Lookup',
     description: 'Queries multiple providers and returns the best match with confidence score',
     details: [
@@ -17,7 +17,7 @@ const endpoints = [
     ],
     icon: Zap,
     path: '/ip-intelligence/waterfall',
-    credits: '1 credit per lookup'
+    credits: '2 credits per lookup'
   },
   {
     id: 'aggregate',
@@ -32,7 +32,7 @@ const endpoints = [
     ],
     icon: Layers,
     path: '/ip-intelligence/aggregate',
-    credits: '3 credits per lookup'
+    credits: '5 credits per lookup'
   }
 ]
 
