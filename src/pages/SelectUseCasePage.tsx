@@ -19,9 +19,9 @@ const scopes = [
     description: 'AI-powered LinkedIn outreach via API',
     details: 'Generate personalized messages and send via connected LinkedIn accounts',
     icon: MessageSquare,
-    steps: 5,
+    steps: 11,
     path: '/messaging',
-    available: false
+    available: true
   },
   {
     id: 'visitor-id',
@@ -29,9 +29,9 @@ const scopes = [
     description: 'Track and identify website visitors',
     details: 'Add tracking script, create ICPs, and identify companies visiting your site',
     icon: Eye,
-    steps: 6,
+    steps: 11,
     path: '/visitor-id',
-    available: false
+    available: true
   },
   {
     id: 'full-platform',
@@ -39,9 +39,9 @@ const scopes = [
     description: 'Everything combined',
     details: 'Complete setup: tracking, ICPs, products, messaging, and outreach',
     icon: Rocket,
-    steps: 11,
+    steps: 13,
     path: '/full-platform',
-    available: false
+    available: true
   }
 ]
 

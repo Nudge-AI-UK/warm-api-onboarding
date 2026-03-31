@@ -7,32 +7,33 @@ const endpoints = [
   {
     id: 'waterfall',
     name: 'ip-to-company',
-    title: 'Waterfall Lookup',
-    description: 'Queries multiple providers and returns the best match with confidence score',
+    title: 'Smart Waterfall Lookup',
+    description: 'Checks free local databases first, then fans out to paid providers only when needed',
     details: [
-      'Queries RB2B, Albacross, Snitcher, Apollo, Clearbit, rDNS, ASN',
-      'Weighted scoring for best domain match',
-      'Returns confidence score and source attribution',
-      'Best for: Fast, cost-efficient company identification'
+      'Free DB filter: 6.7M IP records, 2.4M VPN IPs, 434K hosting ranges',
+      'Paid providers: RB2B, Albacross, ipapi.is, ipinfo.io, rDNS',
+      'VPN, hosting, and ISP traffic detected and filtered automatically',
+      'Consensus scoring with confidence levels (confirmed / likely / unconfirmed)',
+      'Only charges credits for business matches — junk traffic is free'
     ],
     icon: Zap,
     path: '/ip-intelligence/waterfall',
-    credits: '2 credits per lookup'
+    credits: '5 credits per business match'
   },
   {
     id: 'aggregate',
     name: 'ip-to-best-fit',
     title: 'Aggregate Lookup',
-    description: 'Combines data from multiple providers for best accuracy',
+    description: 'Combines data from multiple providers for best accuracy with individual and decision maker enrichment',
     details: [
-      'Queries all available providers simultaneously',
-      'Merges results for comprehensive data',
-      'Higher accuracy and data coverage',
-      'Best for: Critical lookups where data quality matters'
+      'Includes full Smart Waterfall company identification',
+      'Finds individuals and decision makers at the identified company',
+      'Supply your website and business description for contextual matching',
+      'Best for: Critical lookups where data depth matters'
     ],
     icon: Layers,
     path: '/ip-intelligence/aggregate',
-    credits: '5 credits per lookup'
+    credits: '8 credits per lookup'
   }
 ]
 

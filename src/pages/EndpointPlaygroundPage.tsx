@@ -20,19 +20,19 @@ const API_BASE = 'https://api.warmai.uk/functions/v1'
 const endpointConfig = {
   waterfall: {
     name: 'ip-to-company',
-    title: 'Waterfall Lookup',
-    description: 'Queries multiple providers, scores results by confidence, and returns the best match with source attribution.',
+    title: 'Smart Waterfall Lookup',
+    description: 'Checks free local databases (6.7M+ IPs, VPN/hosting detection) first, then fans out to paid providers (RB2B, Albacross, ipapi.is, ipinfo.io). Only charges credits for business matches.',
     icon: Zap,
-    credits: '2 credits per lookup',
+    credits: '5 credits per business match',
     endpoint: 'ip-to-company',
     color: 'blue'
   },
   aggregate: {
     name: 'ip-to-best-fit',
     title: 'Aggregate Lookup',
-    description: 'Queries all providers and combines results for maximum accuracy and data coverage.',
+    description: 'Full Smart Waterfall company identification plus individual and decision maker enrichment.',
     icon: Layers,
-    credits: '5 credits per lookup',
+    credits: '8 credits per lookup',
     endpoint: 'ip-to-best-fit',
     color: 'purple'
   }
@@ -198,7 +198,8 @@ print(data)`
 
 const data = await response.json()
 console.log(data)
-// { ip, domain, confidence, sources }`
+// { ip, identified, domain, company_name, confidence, confidence_level,
+//   traffic_type, reason, matches[], providers_checked, cached }`
         case 'python':
           return `import requests
 
@@ -214,7 +215,8 @@ response = requests.post(
 )
 
 data = response.json()
-# { ip, domain, confidence, sources }
+# { ip, identified, domain, company_name, confidence, confidence_level,
+#   traffic_type, reason, matches[], providers_checked, cached }
 print(data)`
       }
     }
