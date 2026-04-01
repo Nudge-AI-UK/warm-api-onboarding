@@ -29,7 +29,6 @@ import {
   Plus,
   Lock,
   Maximize2,
-  Code,
   ExternalLink
 } from 'lucide-react'
 
