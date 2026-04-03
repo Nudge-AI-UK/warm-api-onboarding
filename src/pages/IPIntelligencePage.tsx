@@ -27,25 +27,6 @@ export default function IPIntelligencePage() {
 
     const createApiKey = async () => {
       try {
-        // Get current session — AuthGate guarantees we have one
-        const { data: { session: currentSession } } = await supabase.auth.getSession()
-
-        if (!currentSession) {
-          // Try refreshing if getSession returns null
-          const { data: refreshData } = await supabase.auth.refreshSession()
-          if (!refreshData.session) {
-            setError('Session expired. Please refresh the page.')
-            setLoading(false)
-            return
-          }
-        }
-
-        // Log token info for debugging
-        const { data: { session: activeSession } } = await supabase.auth.getSession()
-        console.log('Session provider:', activeSession?.user?.app_metadata?.provider)
-        console.log('Token expires:', activeSession?.expires_at ? new Date(activeSession.expires_at * 1000).toISOString() : 'unknown')
-        console.log('User ID:', activeSession?.user?.id)
-
         const { data, error: fnError } = await supabase.functions.invoke('api-key-create', {
           body: {
             name: 'IP Intelligence Key',

@@ -8,7 +8,38 @@ import EndpointPlaygroundPage from './pages/EndpointPlaygroundPage'
 import VisitorIdPage from './pages/VisitorIdPage'
 import MessagingPage from './pages/MessagingPage'
 import FullPlatformPage from './pages/FullPlatformPage'
-import { Loader2 } from 'lucide-react'
+import { Loader2, LogOut } from 'lucide-react'
+
+function UserBadge() {
+  const { user, signOut } = useAuth()
+  if (!user) return null
+
+  const name = user.user_metadata?.full_name || user.user_metadata?.name || user.email?.split('@')[0] || ''
+  const avatar = user.user_metadata?.avatar_url || user.user_metadata?.picture
+  const initial = (name[0] || user.email?.[0] || '?').toUpperCase()
+
+  return (
+    <div className="fixed top-4 right-4 z-50">
+      <div className="flex items-center gap-2 bg-card border border-border rounded-full pl-1.5 pr-3 py-1 shadow-sm">
+        {avatar ? (
+          <img src={avatar} alt="" className="w-6 h-6 rounded-full" referrerPolicy="no-referrer" />
+        ) : (
+          <div className="w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-medium">
+            {initial}
+          </div>
+        )}
+        <span className="text-xs text-muted-foreground max-w-[140px] truncate">{user.email}</span>
+        <button
+          onClick={signOut}
+          className="ml-1 text-muted-foreground hover:text-foreground transition-colors"
+          title="Sign out"
+        >
+          <LogOut className="w-3.5 h-3.5" />
+        </button>
+      </div>
+    </div>
+  )
+}
 
 function AuthGate({ children }: { children: React.ReactNode }) {
   const { session, loading, authError } = useAuth()
@@ -25,7 +56,12 @@ function AuthGate({ children }: { children: React.ReactNode }) {
     return <LoginScreen message={authError} />
   }
 
-  return <>{children}</>
+  return (
+    <>
+      <UserBadge />
+      {children}
+    </>
+  )
 }
 
 export default function App() {
