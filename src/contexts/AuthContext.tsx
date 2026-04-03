@@ -19,8 +19,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [authError, setAuthError] = useState<string | null>(null)
 
   useEffect(() => {
+    // Listen for auth changes FIRST — this catches OAuth callbacks,
+    // magic link verifications, and session refreshes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+      setUser(session?.user ?? null)
+      setAuthError(null)
+      setLoading(false)
+    })
+
+    // Then check for magic link token OR existing session
     const initAuth = async () => {
-      // Check for magic link token in URL (passed from platform)
       const params = new URLSearchParams(window.location.search)
       const tokenHash = params.get('token_hash')
 
@@ -30,13 +39,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           type: 'magiclink'
         })
 
-        // Clean URL regardless of outcome
+        // Clean URL regardless
         window.history.replaceState({}, '', window.location.pathname)
 
         if (!error && data.session) {
-          setSession(data.session)
-          setUser(data.session.user)
-          setLoading(false)
+          // onAuthStateChange will fire and update state
           return
         }
 
@@ -46,22 +53,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return
       }
 
-      // Get existing session
+      // Check for OAuth hash in URL — Supabase handles this automatically
+      // via onAuthStateChange when there's a #access_token in the URL.
+      // If there's a hash fragment, wait for onAuthStateChange to fire.
+      if (window.location.hash && window.location.hash.includes('access_token')) {
+        // onAuthStateChange will handle it — don't set loading false yet
+        return
+      }
+
+      // No token, no hash — check for existing session
       const { data: { session } } = await supabase.auth.getSession()
-      setSession(session)
-      setUser(session?.user ?? null)
+      if (session) {
+        setSession(session)
+        setUser(session.user)
+      }
       setLoading(false)
     }
 
     initAuth()
-
-    // Listen for auth changes (handles Google OAuth callback)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-      setUser(session?.user ?? null)
-      setAuthError(null)
-      setLoading(false)
-    })
 
     return () => subscription.unsubscribe()
   }, [])
