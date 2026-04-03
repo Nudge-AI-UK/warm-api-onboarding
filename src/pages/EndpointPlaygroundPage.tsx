@@ -48,7 +48,7 @@ export default function EndpointPlaygroundPage() {
   const Icon = config.icon
 
   const [apiKeyId, setApiKeyId] = useState<string | null>(null)
-  const [testIp, setTestIp] = useState('8.8.8.8')
+  const [testIp, setTestIp] = useState('104.28.55.201')
   const [executing, setExecuting] = useState(false)
   const [response, setResponse] = useState<any>(null)
   const [error, setError] = useState<string | null>(null)
@@ -290,7 +290,7 @@ print(data)`
                   placeholder="Enter an IP address"
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  Try a corporate IP to see company data
+                  Pre-filled with a known business IP — hit Try It to see results
                 </p>
               </div>
 
