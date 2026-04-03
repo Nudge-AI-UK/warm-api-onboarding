@@ -15,7 +15,8 @@ import {
   ExternalLink
 } from 'lucide-react'
 
-const API_BASE = 'https://api.warmai.uk/functions/v1'
+const API_BASE_V1 = 'https://api.warmai.uk/functions/v1'
+const API_BASE_V2 = 'https://api.warmai.uk/functions/v2'
 
 const endpointConfig = {
   waterfall: {
@@ -81,7 +82,8 @@ export default function EndpointPlaygroundPage() {
     setResponse(null)
 
     try {
-      const res = await fetch(`${API_BASE}/${config.endpoint}`, {
+      const apiBase = endpointType === 'waterfall' ? API_BASE_V2 : API_BASE_V1
+      const res = await fetch(`${apiBase}/${config.endpoint}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -137,14 +139,14 @@ export default function EndpointPlaygroundPage() {
 
       switch (codeLanguage) {
         case 'curl':
-          return `curl -X POST "${API_BASE}/ip-to-best-fit" \\
+          return `curl -X POST "${API_BASE_V1}/ip-to-best-fit" \\
   -H "Content-Type: application/json" \\
   -H "x-access-key: ${keyId}" \\
   -d '{
     "ip_address": "${testIp}"${websiteLine}${descriptionLine}
   }'`
         case 'node':
-          return `const response = await fetch('${API_BASE}/ip-to-best-fit', {
+          return `const response = await fetch('${API_BASE_V1}/ip-to-best-fit', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -161,7 +163,7 @@ console.log(data)`
           return `import requests
 
 response = requests.post(
-    '${API_BASE}/ip-to-best-fit',
+    '${API_BASE_V1}/ip-to-best-fit',
     headers={
         'Content-Type': 'application/json',
         'x-access-key': '${keyId}'
@@ -178,14 +180,14 @@ print(data)`
       // Waterfall (ip-company)
       switch (codeLanguage) {
         case 'curl':
-          return `curl -X POST "${API_BASE}/ip-to-company" \\
+          return `curl -X POST "${API_BASE_V2}/ip-to-company" \\
   -H "Content-Type: application/json" \\
   -H "x-access-key: ${keyId}" \\
   -d '{
     "ip": "${testIp}"
   }'`
         case 'node':
-          return `const response = await fetch('${API_BASE}/ip-to-company', {
+          return `const response = await fetch('${API_BASE_V2}/ip-to-company', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -204,7 +206,7 @@ console.log(data)
           return `import requests
 
 response = requests.post(
-    '${API_BASE}/ip-to-company',
+    '${API_BASE_V2}/ip-to-company',
     headers={
         'Content-Type': 'application/json',
         'x-access-key': '${keyId}'
