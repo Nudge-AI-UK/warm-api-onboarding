@@ -6,8 +6,7 @@ interface AuthContextType {
   user: User | null
   session: Session | null
   loading: boolean
-  signIn: (email: string, password: string, captchaToken?: string) => Promise<{ error: Error | null }>
-  signUp: (email: string, password: string, captchaToken?: string) => Promise<{ error: Error | null }>
+  authError: string | null
   signOut: () => Promise<void>
 }
 
@@ -17,6 +16,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
+  const [authError, setAuthError] = useState<string | null>(null)
 
   useEffect(() => {
     const initAuth = async () => {
@@ -25,20 +25,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const tokenHash = params.get('token_hash')
 
       if (tokenHash) {
-        // Verify the magic link token to establish session
         const { data, error } = await supabase.auth.verifyOtp({
           token_hash: tokenHash,
           type: 'magiclink'
         })
 
+        // Clean URL regardless of outcome
+        window.history.replaceState({}, '', window.location.pathname)
+
         if (!error && data.session) {
           setSession(data.session)
           setUser(data.session.user)
-        } else {
-          console.error('Failed to verify onboarding token:', error)
+          setLoading(false)
+          return
         }
-        // Clean URL
-        window.history.replaceState({}, '', window.location.pathname)
+
+        console.error('Failed to verify onboarding token:', error)
+        setAuthError('Your sign-in link has expired. Please sign in again.')
         setLoading(false)
         return
       }
@@ -52,40 +55,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     initAuth()
 
-    // Listen for auth changes
+    // Listen for auth changes (handles Google OAuth callback)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
       setUser(session?.user ?? null)
+      setAuthError(null)
       setLoading(false)
     })
 
     return () => subscription.unsubscribe()
   }, [])
 
-  const signIn = async (email: string, password: string, captchaToken?: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-      options: captchaToken ? { captchaToken } : undefined
-    })
-    return { error: error as Error | null }
-  }
-
-  const signUp = async (email: string, password: string, captchaToken?: string) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: captchaToken ? { captchaToken } : undefined
-    })
-    return { error: error as Error | null }
-  }
-
   const signOut = async () => {
     await supabase.auth.signOut()
   }
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, authError, signOut }}>
       {children}
     </AuthContext.Provider>
   )
