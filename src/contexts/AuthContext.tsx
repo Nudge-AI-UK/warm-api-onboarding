@@ -34,13 +34,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const tokenHash = params.get('token_hash')
 
       if (tokenHash) {
+        // Clean URL immediately to prevent token leaking via referrer/history
+        window.history.replaceState({}, '', window.location.pathname)
+
         const { data, error } = await supabase.auth.verifyOtp({
           token_hash: tokenHash,
           type: 'magiclink'
         })
-
-        // Clean URL regardless
-        window.history.replaceState({}, '', window.location.pathname)
 
         if (!error && data.session) {
           // onAuthStateChange will fire and update state

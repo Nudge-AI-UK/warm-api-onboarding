@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Zap, Layers, ChevronRight, ChevronLeft, ExternalLink } from 'lucide-react'
+import { navigateToPlatform } from '@/lib/navigateToPlatform'
 
 const endpoints = [
   {
@@ -57,7 +58,7 @@ export default function EndpointSelectionPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => window.location.href = 'https://platform.warmai.uk'}
+              onClick={() => navigateToPlatform()}
             >
               Go to Platform
               <ExternalLink className="h-4 w-4 ml-2" />

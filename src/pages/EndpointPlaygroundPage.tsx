@@ -14,6 +14,7 @@ import {
   Layers,
   ExternalLink
 } from 'lucide-react'
+import { navigateToPlatform } from '@/lib/navigateToPlatform'
 
 const API_BASE = 'https://api.warmai.uk/functions/v1'
 
@@ -63,10 +64,10 @@ export default function EndpointPlaygroundPage() {
   const [description, setDescription] = useState('')
 
   useEffect(() => {
-    // Load API key ID from localStorage
-    const storedKeyId = localStorage.getItem('warm-ip-api-key')
-    if (storedKeyId) {
-      setApiKeyId(storedKeyId)
+    // Load API key from sessionStorage (set during key creation)
+    const storedKey = sessionStorage.getItem('warm-ip-api-key')
+    if (storedKey) {
+      setApiKeyId(storedKey)
     }
   }, [])
 
@@ -247,7 +248,7 @@ print(data)`
             <Button
               variant="outline"
               size="sm"
-              onClick={() => window.location.href = 'https://platform.warmai.uk'}
+              onClick={() => navigateToPlatform()}
             >
               Go to Platform
               <ExternalLink className="h-4 w-4 ml-2" />
@@ -259,8 +260,12 @@ print(data)`
       <div className="max-w-5xl mx-auto px-6 py-8">
         {/* Endpoint Header */}
         <div className="flex items-start gap-4 mb-8">
-          <div className={`w-14 h-14 rounded-xl bg-${config.color}-500/10 flex items-center justify-center`}>
-            <Icon className={`h-7 w-7 text-${config.color}-500`} />
+          <div className={`w-14 h-14 rounded-xl flex items-center justify-center ${
+            config.color === 'purple' ? 'bg-purple-500/10' : 'bg-blue-500/10'
+          }`}>
+            <Icon className={`h-7 w-7 ${
+              config.color === 'purple' ? 'text-purple-500' : 'text-blue-500'
+            }`} />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-foreground">{config.title}</h1>

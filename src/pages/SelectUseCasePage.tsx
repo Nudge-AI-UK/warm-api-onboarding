@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom'
 import { Card, CardContent } from '@/components/ui/card'
-import { Search, MessageSquare, Eye, Rocket, ChevronRight } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Search, MessageSquare, Eye, Rocket, ChevronRight, LogOut } from 'lucide-react'
+import { useAuth } from '@/contexts/AuthContext'
 
 const scopes = [
   {
@@ -47,19 +49,59 @@ const scopes = [
 
 export default function SelectUseCasePage() {
   const navigate = useNavigate()
+  const { user, signOut, loading } = useAuth()
+
+  // Redirect to login if not authenticated
+  if (!loading && !user) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card className="w-full max-w-md bg-card border-border">
+          <CardContent className="p-8 text-center">
+            <h2 className="text-xl font-bold text-foreground mb-2">Sign in required</h2>
+            <p className="text-muted-foreground mb-6">Please sign in to continue setting up your API.</p>
+            <p className="text-xs text-muted-foreground">
+              Go to <a href="https://platform.warmai.uk" className="text-primary hover:underline">platform.warmai.uk</a> to sign in.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="border-b border-border bg-card">
         <div className="max-w-4xl mx-auto px-6 py-8">
-          <div className="flex items-center gap-3 mb-2">
-            <img
-              src="/warm-logo.svg"
-              alt="Warm AI"
-              className="h-10 w-10"
-            />
-            <span className="text-xl font-bold text-foreground">Warm AI</span>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <img
+                src="/warm-logo.svg"
+                alt="Warm AI"
+                className="h-10 w-10"
+              />
+              <span className="text-xl font-bold text-foreground">Warm AI</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-muted-foreground">{user?.email}</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={async () => { await signOut(); window.location.href = 'https://platform.warmai.uk' }}
+                className="text-muted-foreground"
+              >
+                <LogOut className="h-4 w-4 mr-1" />
+                Wrong account?
+              </Button>
+            </div>
           </div>
           <h1 className="text-3xl font-bold text-foreground mt-6">What do you want to build?</h1>
           <p className="text-muted-foreground mt-2">

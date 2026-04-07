@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -9,56 +9,66 @@ import {
   Loader2,
   AlertTriangle,
   ArrowRight,
-  Check,
+  Check
 } from 'lucide-react'
 
 export default function IPIntelligencePage() {
   const navigate = useNavigate()
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [apiKey, setApiKey] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
-  const hasCreated = useRef(false)
+  const [created, setCreated] = useState(false)
 
-  // Create API key on mount (auth is guaranteed by AuthGate)
-  useEffect(() => {
-    if (hasCreated.current) return
-    hasCreated.current = true
+  const createApiKey = useCallback(async () => {
+    if (created && !error) return
+    setLoading(true)
+    setError(null)
 
-    const createApiKey = async () => {
-      try {
-        const { data, error: fnError } = await supabase.functions.invoke('api-key-create', {
-          body: {
-            name: 'IP Intelligence Key',
-            aggregate_identify: true
-          }
-        })
-
-        if (fnError) {
-          let errorBody: string | null = null
-          try {
-            if (fnError.context) {
-              errorBody = await fnError.context.text()
-            }
-          } catch {}
-          console.error('Edge function error:', errorBody || fnError)
-          throw new Error(errorBody || fnError.message || 'Edge function error')
-        }
-        if (!data?.success) throw new Error(data?.error || 'Failed to create API key')
-
-        setApiKey(data.key)
-        localStorage.setItem('warm-ip-api-key', data.key)
-        localStorage.setItem('warm-ip-api-key-id', data.id)
-      } catch (err: any) {
-        console.error('Failed to create API key:', err)
-        setError(err.message || 'Failed to create API key')
-      } finally {
+    try {
+      // Refresh session to ensure JWT is valid
+      const { data: refreshData } = await supabase.auth.refreshSession()
+      if (!refreshData.session) {
+        setError('Your session has expired. Please go back and sign in again.')
         setLoading(false)
+        return
       }
-    }
 
-    createApiKey()
-  }, [])
+      const { data, error: fnError } = await supabase.functions.invoke('api-key-create', {
+        body: {
+          name: 'IP Intelligence Key',
+          aggregate_identify: true
+        }
+      })
+
+      if (fnError) {
+        let errorBody: string | null = null
+        try {
+          if (fnError.context) {
+            errorBody = await fnError.context.text()
+          }
+        } catch {}
+        throw new Error(errorBody || fnError.message || 'Edge function error')
+      }
+      if (!data?.success) throw new Error(data?.error || 'Failed to create API key')
+
+      setApiKey(data.key)
+      setCreated(true)
+
+      // Store key ID in sessionStorage (not localStorage) for playground — cleared when tab closes
+      sessionStorage.setItem('warm-ip-api-key', data.key)
+      sessionStorage.setItem('warm-ip-api-key-id', data.id)
+    } catch (err: any) {
+      console.error('Failed to create API key:', err.message)
+      setError(err.message || 'Failed to create API key')
+    } finally {
+      setLoading(false)
+    }
+  }, [created, error])
+
+  // Auto-create on first render
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { createApiKey() }, [])
 
   const copyToClipboard = async () => {
     if (apiKey) {
@@ -88,9 +98,12 @@ export default function IPIntelligencePage() {
               <AlertTriangle className="h-8 w-8 text-red-500" />
             </div>
             <h2 className="text-xl font-bold text-foreground mb-2">Something went wrong</h2>
-            <p className="text-muted-foreground mb-6">{error}</p>
+            <p className="text-muted-foreground mb-4">{error}</p>
+            <p className="text-xs text-muted-foreground mb-6">
+              If this keeps happening, contact <a href="mailto:support@warmai.uk" className="text-primary hover:underline">support@warmai.uk</a>
+            </p>
             <div className="flex gap-3 justify-center">
-              <Button onClick={() => { setError(null); hasCreated.current = false; setLoading(true) }} variant="outline">
+              <Button onClick={() => { setError(null); createApiKey() }} variant="outline">
                 Try again
               </Button>
               <Button onClick={() => navigate('/')} variant="ghost">
