@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 import { LoginScreen } from '@/components/LoginScreen'
 import SelectUseCasePage from './pages/SelectUseCasePage'
+import SetupPage from './pages/SetupPage'
 import IPIntelligencePage from './pages/IPIntelligencePage'
 import EndpointSelectionPage from './pages/EndpointSelectionPage'
 import EndpointPlaygroundPage from './pages/EndpointPlaygroundPage'
@@ -67,6 +68,7 @@ function AuthGate({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <Routes>
+      <Route path="/setup" element={<SetupPage />} />
       <Route path="/" element={<SelectUseCasePage />} />
       <Route path="/ip-intelligence" element={<AuthGate><IPIntelligencePage /></AuthGate>} />
       <Route path="/ip-intelligence/endpoints" element={<AuthGate><EndpointSelectionPage /></AuthGate>} />

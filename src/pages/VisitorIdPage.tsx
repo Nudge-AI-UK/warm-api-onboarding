@@ -1683,13 +1683,35 @@ response = requests.post(
             </div>
           )}
 
-          <Button
-            onClick={goToNextStep}
-            className="w-full bg-primary text-primary-foreground"
-          >
-            Continue to Step 2
-            <ChevronRight className="h-4 w-4 ml-2" />
-          </Button>
+          <div className="space-y-3">
+            <p className="text-sm text-muted-foreground text-center font-medium">What would you like to do?</p>
+            <Button
+              onClick={goToNextStep}
+              className="w-full bg-primary text-primary-foreground"
+            >
+              Full Setup
+              <ChevronRight className="h-4 w-4 ml-2" />
+            </Button>
+            <Button
+              onClick={() => {
+                setState(prev => ({
+                  ...prev,
+                  completedSteps: Array.from(new Set([...prev.completedSteps, 2, 3, 4, 5, 6, 7, 8, 9])),
+                  currentStep: 10
+                }))
+                setResponse(null)
+                setError(null)
+              }}
+              variant="outline"
+              className="w-full border-border"
+            >
+              <Globe className="h-4 w-4 mr-2" />
+              Skip to Website Tracking
+            </Button>
+            <p className="text-xs text-muted-foreground text-center">
+              Choose "Full Setup" to configure messaging, products, and ICPs. Choose "Skip to Website Tracking" if you only need visitor identification.
+            </p>
+          </div>
         </div>
       )
     }
