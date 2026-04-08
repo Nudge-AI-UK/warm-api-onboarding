@@ -34,10 +34,13 @@ function UserBadge() {
           href="https://platform.warmai.uk"
           target="_blank"
           rel="noopener noreferrer"
-          className="ml-1 text-muted-foreground hover:text-foreground transition-colors"
-          title="Open Dashboard"
+          className="group ml-1 flex items-center gap-1 text-muted-foreground hover:text-foreground transition-all"
+          title="Go to my dashboard"
         >
           <LayoutDashboard className="w-3.5 h-3.5" />
+          <span className="max-w-0 overflow-hidden whitespace-nowrap text-xs group-hover:max-w-[120px] transition-all duration-300 ease-in-out">
+            My Dashboard
+          </span>
         </a>
         <button
           onClick={signOut}
