@@ -4239,10 +4239,10 @@ response = requests.post(
       <main className="flex-1">
         <div className="border-b border-border bg-card">
           <div className="px-8 py-4">
-            <div className="flex items-center gap-3">
+            <a href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
               <img src="/warm-logo.svg" alt="Warm AI" className="h-8 w-8" />
               <span className="font-semibold text-foreground">Warm AI</span>
-            </div>
+            </a>
           </div>
         </div>
         <div className="p-8">

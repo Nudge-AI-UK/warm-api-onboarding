@@ -9,7 +9,7 @@ import EndpointPlaygroundPage from './pages/EndpointPlaygroundPage'
 import VisitorIdPage from './pages/VisitorIdPage'
 import MessagingPage from './pages/MessagingPage'
 import FullPlatformPage from './pages/FullPlatformPage'
-import { Loader2, LogOut, LayoutDashboard } from 'lucide-react'
+import { Loader2, LogOut, LayoutDashboard, ArrowLeftRight } from 'lucide-react'
 
 function UserBadge() {
   const { user, signOut } = useAuth()
@@ -30,6 +30,16 @@ function UserBadge() {
           </div>
         )}
         <span className="text-xs text-muted-foreground max-w-[140px] truncate">{user.email}</span>
+        <a
+          href="/"
+          className="group ml-1 flex items-center gap-1 text-muted-foreground hover:text-foreground transition-all"
+          title="Change setup scope"
+        >
+          <ArrowLeftRight className="w-3.5 h-3.5" />
+          <span className="max-w-0 overflow-hidden whitespace-nowrap text-xs group-hover:max-w-[120px] transition-all duration-300 ease-in-out">
+            Change Scope
+          </span>
+        </a>
         <a
           href="https://platform.warmai.uk"
           target="_blank"

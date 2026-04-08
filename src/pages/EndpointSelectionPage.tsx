@@ -48,10 +48,10 @@ export default function EndpointSelectionPage() {
         <div className="max-w-4xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
+              <a href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
                 <img src="/warm-logo.svg" alt="Warm AI" className="h-8 w-8" />
                 <span className="font-semibold text-foreground">Warm AI</span>
-              </div>
+              </a>
               <div className="h-6 w-px bg-border" />
               <span className="text-muted-foreground">IP Intelligence</span>
             </div>

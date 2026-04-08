@@ -121,10 +121,10 @@ export default function IPIntelligencePage() {
       {/* Header */}
       <div className="border-b border-border bg-card">
         <div className="max-w-3xl mx-auto px-6 py-4">
-          <div className="flex items-center gap-3">
+          <a href="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
             <img src="/warm-logo.svg" alt="Warm AI" className="h-8 w-8" />
             <span className="font-semibold text-foreground">Warm AI</span>
-          </div>
+          </a>
         </div>
       </div>
 
