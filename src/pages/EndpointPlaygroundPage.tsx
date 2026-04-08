@@ -200,7 +200,7 @@ print(data)`
 const data = await response.json()
 console.log(data)
 // { ip, identified, domain, company_name, confidence, confidence_level,
-//   traffic_type, reason, matches[], providers_checked, cached }`
+//   traffic_type, reason, matches[], cached }`
         case 'python':
           return `import requests
 
@@ -217,7 +217,7 @@ response = requests.post(
 
 data = response.json()
 # { ip, identified, domain, company_name, confidence, confidence_level,
-#   traffic_type, reason, matches[], providers_checked, cached }
+#   traffic_type, reason, matches[], cached }
 print(data)`
       }
     }

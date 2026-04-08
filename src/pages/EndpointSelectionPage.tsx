@@ -12,7 +12,7 @@ const endpoints = [
     description: 'Checks free local databases first, then fans out to paid providers only when needed',
     details: [
       'Free DB filter: 6.7M IP records, 2.4M VPN IPs, 434K hosting ranges',
-      'Paid providers: RB2B, Albacross, ipapi.is, ipinfo.io, rDNS',
+      'Multiple paid identification providers called in parallel',
       'VPN, hosting, and ISP traffic detected and filtered automatically',
       'Consensus scoring with confidence levels (confirmed / likely / unconfirmed)',
       'Only charges credits for business matches — junk traffic is free'
