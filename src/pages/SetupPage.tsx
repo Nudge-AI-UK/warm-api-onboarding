@@ -65,7 +65,7 @@ export default function SetupPage() {
     }
 
     setupAccount()
-  }, [email, token])
+  }, [email])
 
   const steps = [
     { id: 'validating', label: 'Verifying your link' },
