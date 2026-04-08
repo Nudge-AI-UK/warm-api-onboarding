@@ -9,7 +9,7 @@ import EndpointPlaygroundPage from './pages/EndpointPlaygroundPage'
 import VisitorIdPage from './pages/VisitorIdPage'
 import MessagingPage from './pages/MessagingPage'
 import FullPlatformPage from './pages/FullPlatformPage'
-import { Loader2, LogOut } from 'lucide-react'
+import { Loader2, LogOut, LayoutDashboard } from 'lucide-react'
 
 function UserBadge() {
   const { user, signOut } = useAuth()
@@ -30,6 +30,15 @@ function UserBadge() {
           </div>
         )}
         <span className="text-xs text-muted-foreground max-w-[140px] truncate">{user.email}</span>
+        <a
+          href="https://platform.warmai.uk"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="ml-1 text-muted-foreground hover:text-foreground transition-colors"
+          title="Open Dashboard"
+        >
+          <LayoutDashboard className="w-3.5 h-3.5" />
+        </a>
         <button
           onClick={signOut}
           className="ml-1 text-muted-foreground hover:text-foreground transition-colors"

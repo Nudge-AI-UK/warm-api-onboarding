@@ -4436,12 +4436,19 @@ response = requests.post(
                       You've completed all the steps to integrate with Warm AI. You now have an API key,
                       a product in your knowledge base, an ICP defined, and website tracking set up.
                     </p>
-                    <div className="flex gap-4 justify-center">
+                    <div className="flex gap-4 justify-center flex-wrap">
                       <Button variant="outline" onClick={resetWizard}>
                         Start Over
                       </Button>
                       <Button
                         className="bg-primary text-primary-foreground"
+                        onClick={() => window.open('https://platform.warmai.uk', '_blank')}
+                      >
+                        <ExternalLink className="h-4 w-4 mr-2" />
+                        Open Dashboard
+                      </Button>
+                      <Button
+                        variant="outline"
                         onClick={() => window.open('https://docs.warmai.uk/messaging-api/request-builder', '_blank')}
                       >
                         <ExternalLink className="h-4 w-4 mr-2" />
