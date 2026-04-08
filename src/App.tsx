@@ -30,28 +30,34 @@ function UserBadge() {
           </div>
         )}
         <span className="text-xs text-muted-foreground max-w-[140px] truncate">{user.email}</span>
-        <a
-          href="/"
-          className="group ml-1 flex items-center gap-1 text-muted-foreground hover:text-foreground transition-all"
-          title="Change setup scope"
-        >
-          <ArrowLeftRight className="w-3.5 h-3.5" />
-          <span className="max-w-0 overflow-hidden whitespace-nowrap text-xs group-hover:max-w-[120px] transition-all duration-300 ease-in-out">
-            Change Scope
-          </span>
-        </a>
-        <a
-          href="https://platform.warmai.uk"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group ml-1 flex items-center gap-1 text-muted-foreground hover:text-foreground transition-all"
-          title="Go to my dashboard"
-        >
-          <LayoutDashboard className="w-3.5 h-3.5" />
-          <span className="max-w-0 overflow-hidden whitespace-nowrap text-xs group-hover:max-w-[120px] transition-all duration-300 ease-in-out">
-            My Dashboard
-          </span>
-        </a>
+        <div className="flex items-center ml-1 gap-0.5">
+          <a
+            href="/"
+            className="group relative flex items-center gap-1 px-1.5 py-0.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
+            title="Change setup scope"
+          >
+            <ArrowLeftRight className="w-3.5 h-3.5 flex-shrink-0" />
+            <span className="grid grid-cols-[0fr] group-hover:grid-cols-[1fr] transition-[grid-template-columns] duration-300 ease-in-out">
+              <span className="overflow-hidden whitespace-nowrap text-xs">
+                Change Scope
+              </span>
+            </span>
+          </a>
+          <a
+            href="https://platform.warmai.uk"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group relative flex items-center gap-1 px-1.5 py-0.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200"
+            title="Go to my dashboard"
+          >
+            <LayoutDashboard className="w-3.5 h-3.5 flex-shrink-0" />
+            <span className="grid grid-cols-[0fr] group-hover:grid-cols-[1fr] transition-[grid-template-columns] duration-300 ease-in-out">
+              <span className="overflow-hidden whitespace-nowrap text-xs">
+                My Dashboard
+              </span>
+            </span>
+          </a>
+        </div>
         <button
           onClick={signOut}
           className="ml-1 text-muted-foreground hover:text-foreground transition-colors"
