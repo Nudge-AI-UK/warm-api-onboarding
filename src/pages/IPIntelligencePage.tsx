@@ -42,13 +42,19 @@ export default function IPIntelligencePage() {
       })
 
       if (fnError) {
-        let errorBody: string | null = null
+        let errorMessage = fnError.message || 'Edge function error'
         try {
           if (fnError.context) {
-            errorBody = await fnError.context.text()
+            const text = await fnError.context.text()
+            try {
+              const parsed = JSON.parse(text)
+              errorMessage = parsed.error || parsed.message || text
+            } catch {
+              errorMessage = text || errorMessage
+            }
           }
         } catch {}
-        throw new Error(errorBody || fnError.message || 'Edge function error')
+        throw new Error(errorMessage)
       }
       if (!data?.success) throw new Error(data?.error || 'Failed to create API key')
 
