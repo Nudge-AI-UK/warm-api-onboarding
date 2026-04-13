@@ -71,11 +71,13 @@ export default function SetupPage() {
   }, [confirmedEmail])
 
   function handleContinueWithEmail() {
-    setConfirmedEmail(email)
+    if (!email) return
+    setConfirmedEmail(email.trim())
   }
 
   function handleContinueWithNewEmail() {
-    setConfirmedEmail(emailInput)
+    if (!isValidEmail) return
+    setConfirmedEmail(emailInput.trim())
   }
 
   const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput)
