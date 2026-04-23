@@ -4876,6 +4876,25 @@ response = requests.post(
                     </button>
                   </div>
 
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20">
+                    <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                    <div className="text-xs text-amber-700 dark:text-amber-300">
+                      <strong>Consent & compliance:</strong> warm.js sets a first-party{' '}
+                      <code className="px-1 py-0.5 bg-amber-500/10 rounded font-mono text-[11px]">warm_device</code>{' '}
+                      cookie for visitor identification. Your site must handle visitor consent appropriately —
+                      most consent platforms (Cookiebot, OneTrust, Termly) block third-party scripts until
+                      consent is granted.{' '}
+                      <a
+                        href="https://docs.warmai.uk/guides/compliance"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline hover:no-underline"
+                      >
+                        See our compliance guide →
+                      </a>
+                    </div>
+                  </div>
+
                   <div className="flex flex-col gap-2 pt-2">
                     <a
                       href="https://tagmanager.google.com/gallery/#/?filter=Warm%20AI"
