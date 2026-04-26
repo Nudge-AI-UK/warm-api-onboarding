@@ -33,8 +33,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Listen for auth changes FIRST — this catches OAuth callbacks,
     // magic link verifications, and session refreshes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (!mounted) return
+      // TOKEN_REFRESH_FAILED is emitted by newer Supabase SDK versions — cast to string
+      // for forward-compatibility without breaking the current SDK type
+      if ((event as string) === 'TOKEN_REFRESH_FAILED' || event === 'SIGNED_OUT') {
+        setSession(null)
+        setUser(null)
+        setAuthError('Your session has expired. Please sign in again.')
+        setLoading(false)
+        return
+      }
       setSession(session)
       setUser(session?.user ?? null)
       setAuthError(null)
