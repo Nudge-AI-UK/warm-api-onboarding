@@ -14,10 +14,24 @@ export async function callEdgeFunction<T = any>(
   friendlyName = 'Request',
 ): Promise<{ data?: T; error?: AppError }> {
 
-  // 1. Ensure session is fresh before calling
+  // 1. Ensure session is fresh before calling. Distinguish a network blip
+  //    (transient, recoverable) from an actual auth failure (refresh-token
+  //    rotation rejected, etc.) — we don't want a flaky wifi to force logout.
   const { data: { session }, error: refreshError } = await supabase.auth.refreshSession()
-  if (refreshError || !session) {
+  if (refreshError) {
+    const msg = (refreshError.message || '').toLowerCase()
+    const looksNetwork =
+      msg.includes('failed to fetch') ||
+      msg.includes('networkerror') ||
+      msg.includes('network request failed') ||
+      msg.includes('load failed')
+    if (looksNetwork) {
+      return { error: { kind: 'network_failed', message: `${friendlyName} couldn't reach the server. Check your connection and try again.`, raw: refreshError } }
+    }
     return { error: { kind: 'auth_required', message: 'Your session has expired. Sign in again to continue.', raw: refreshError } }
+  }
+  if (!session) {
+    return { error: { kind: 'auth_required', message: 'Your session has expired. Sign in again to continue.' } }
   }
 
   // 2. Invoke
