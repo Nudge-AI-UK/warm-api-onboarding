@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { supabase } from '@/integrations/supabase/client'
 import { useAuth } from '@/contexts/AuthContext'
+import { callEdgeFunction } from '@/lib/supabase/callEdgeFunction'
+import { useHandleAppError } from '@/hooks/useHandleAppError'
 import {
   CheckCircle2,
   Circle,
@@ -471,6 +473,7 @@ function generateWebhookSecret(): string {
 
 export default function FullPlatformPage() {
   const { user } = useAuth()
+  const handleAppError = useHandleAppError()
   const [state, setState] = useState<WizardState>(defaultState)
   const [isInitialized, setIsInitialized] = useState(false)
   const [executing, setExecuting] = useState(false)
@@ -655,25 +658,25 @@ export default function FullPlatformPage() {
         return
       }
 
-      try {
-        const { data, error } = await supabase.functions.invoke('user-list', {
-          headers: { 'x-access-key': state.accessKey || '' }
-        })
+      const { data, error } = await callEdgeFunction('user-list', {
+        headers: { 'x-access-key': state.accessKey || '' }
+      })
 
-        if (!error && data?.data?.length > 0) {
-          // Users exist - auto-complete step 2 and store first user ID
-          const completedSteps = new Set(state.completedSteps)
-          completedSteps.add(2)
+      if (error) {
+        console.warn('Auto-check for users failed:', error)
+        return
+      }
 
-          setState(prev => ({
-            ...prev,
-            userId: data.data[0]?.id || prev.userId,
-            completedSteps: Array.from(completedSteps)
-          }))
-        }
-      } catch (e) {
-        // Silently fail - user can still proceed manually
-        console.log('Auto-check for users failed:', e)
+      if (data?.data?.length > 0) {
+        // Users exist - auto-complete step 2 and store first user ID
+        const completedSteps = new Set(state.completedSteps)
+        completedSteps.add(2)
+
+        setState(prev => ({
+          ...prev,
+          userId: data.data[0]?.id || prev.userId,
+          completedSteps: Array.from(completedSteps)
+        }))
       }
     }
 
@@ -1252,7 +1255,7 @@ print("Approved:", data["approved_count"])`
       switch (state.currentStep) {
         case 1: {
           // Create API Key using Supabase function with all options
-          const { data, error: fnError } = await supabase.functions.invoke('api-key-create', {
+          const { data, error } = await callEdgeFunction('api-key-create', {
             body: {
               name: keyName.trim() || 'My API Key',
               org_name: orgName.trim() || null,
@@ -1261,8 +1264,8 @@ print("Approved:", data["approved_count"])`
               allowed_origins: allowedOrigins.length > 0 ? allowedOrigins : null,
               allow_app_access: allowAppAccess
             }
-          })
-          if (fnError) throw fnError
+          }, 'Create API key')
+          if (error) { handleAppError(error, setError); return }
           result = data
           setState(prev => ({
             ...prev,
@@ -1287,10 +1290,10 @@ print("Approved:", data["approved_count"])`
 
         case 3: {
           // List users - uses x-access-key header
-          const { data, error: fnError } = await supabase.functions.invoke('user-list', {
+          const { data, error } = await callEdgeFunction('user-list', {
             headers: state.accessKey ? { 'x-access-key': state.accessKey } : undefined
-          })
-          if (fnError) throw fnError
+          }, 'List users')
+          if (error) { handleAppError(error, setError); return }
           result = data
 
           // Check if users were found (response format: { success, data, total })
@@ -1314,7 +1317,7 @@ print("Approved:", data["approved_count"])`
 
         case 4: {
           // Create product/service - uses api-knowledge-action with add_entry
-          const { data, error: fnError } = await supabase.functions.invoke('api-knowledge-action', {
+          const { data, error } = await callEdgeFunction('api-knowledge-action', {
             body: {
               action: 'add_entry',
               knowledge_type: knowledgeType,
@@ -1325,8 +1328,8 @@ print("Approved:", data["approved_count"])`
               'x-idempotency-key': crypto.randomUUID(),
               'x-user-id': state.userId || ''
             }
-          })
-          if (fnError) throw fnError
+          }, 'Add knowledge entry')
+          if (error) { handleAppError(error, setError); return }
           if (!data.success) throw new Error(data.error || 'Failed to create product')
           result = data
           // Entry ID can be in different places depending on response format
@@ -1376,7 +1379,7 @@ print("Approved:", data["approved_count"])`
           // Include any edits made to the content
           const reconstructedContent = formToMarkdown(entryEditForm)
 
-          const { data, error: fnError } = await supabase.functions.invoke('api-knowledge-action', {
+          const { data, error } = await callEdgeFunction('api-knowledge-action', {
             body: {
               action: 'approve_entry',
               data: {
@@ -1391,8 +1394,8 @@ print("Approved:", data["approved_count"])`
               'x-idempotency-key': crypto.randomUUID(),
               'x-user-id': state.userId || ''
             }
-          })
-          if (fnError) throw fnError
+          }, 'Approve knowledge entry')
+          if (error) { handleAppError(error, setError); return }
           if (!data.success && data.error) throw new Error(data.error)
           result = data
           setState(prev => ({
@@ -1408,11 +1411,11 @@ print("Approved:", data["approved_count"])`
           if (includeUserIdFilter && state.userId) {
             listBody.user_id = state.userId
           }
-          const { data, error: fnError } = await supabase.functions.invoke('api-knowledge-action', {
+          const { data, error } = await callEdgeFunction('api-knowledge-action', {
             body: listBody,
             headers: { 'x-access-key': state.accessKey || '' }
-          })
-          if (fnError) throw fnError
+          }, 'List knowledge entries')
+          if (error) { handleAppError(error, setError); return }
           if (!data.success) throw new Error(data.error || 'Failed to list products')
           result = data
           setState(prev => ({
@@ -1453,15 +1456,15 @@ print("Approved:", data["approved_count"])`
             icpBody.company_characteristics = icpCompanyCharacteristics.trim()
           }
 
-          const { data, error: fnError } = await supabase.functions.invoke('api-icp-action', {
+          const { data, error } = await callEdgeFunction('api-icp-action', {
             body: icpBody,
             headers: {
               'x-access-key': state.accessKey || '',
               'x-idempotency-key': crypto.randomUUID(),
               'x-user-id': state.userId || ''
             }
-          })
-          if (fnError) throw fnError
+          }, 'Create ICP')
+          if (error) { handleAppError(error, setError); return }
           if (!data.success) throw new Error(data.error || 'Failed to create ICP')
           result = data
           setState(prev => ({
@@ -1506,15 +1509,15 @@ print("Approved:", data["approved_count"])`
             approveBody.updates = icpUpdates
           }
 
-          const { data, error: fnError } = await supabase.functions.invoke('api-icp-action', {
+          const { data, error } = await callEdgeFunction('api-icp-action', {
             body: approveBody,
             headers: {
               'x-access-key': state.accessKey || '',
               'x-idempotency-key': crypto.randomUUID(),
               'x-user-id': state.userId || ''
             }
-          })
-          if (fnError) throw fnError
+          }, 'Approve ICP')
+          if (error) { handleAppError(error, setError); return }
           if (!data.success && data.error) throw new Error(data.error)
           result = data
           setState(prev => ({
@@ -1535,16 +1538,15 @@ print("Approved:", data["approved_count"])`
             listIcpBody.user_id = state.userId
           }
 
-          const { data, error: fnError } = await supabase.functions.invoke('api-icp-action', {
+          const { data, error } = await callEdgeFunction('api-icp-action', {
             body: listIcpBody,
             headers: {
               'x-access-key': state.accessKey || '',
               'x-idempotency-key': crypto.randomUUID(),
               'x-user-id': state.userId || ''
             }
-          })
-
-          if (fnError) throw fnError
+          }, 'List ICPs')
+          if (error) { handleAppError(error, setError); return }
           if (!data.success) throw new Error(data.error || 'Failed to list ICPs')
 
           result = data
@@ -1567,15 +1569,15 @@ print("Approved:", data["approved_count"])`
           if (linkIcpToWebsite && state.icpId) {
             websiteBody.icp_ids = [parseInt(state.icpId)]
           }
-          const { data, error: fnError } = await supabase.functions.invoke('api-website-action', {
+          const { data, error } = await callEdgeFunction('api-website-action', {
             body: websiteBody,
             headers: {
               'x-access-key': state.accessKey || '',
               'x-idempotency-key': crypto.randomUUID(),
               'x-user-id': state.userId || ''
             }
-          })
-          if (fnError) throw fnError
+          }, 'Create website')
+          if (error) { handleAppError(error, setError); return }
           if (!data.success) throw new Error(data.error || 'Failed to create website')
           result = data
           setState(prev => ({
@@ -1589,15 +1591,15 @@ print("Approved:", data["approved_count"])`
 
         case 11: {
           // List websites
-          const { data, error: fnError } = await supabase.functions.invoke('api-website-action', {
+          const { data, error } = await callEdgeFunction('api-website-action', {
             body: { action: 'list_websites' },
             headers: {
               'x-access-key': state.accessKey || '',
               'x-idempotency-key': crypto.randomUUID(),
               'x-user-id': state.userId || ''
             }
-          })
-          if (fnError) throw fnError
+          }, 'List websites')
+          if (error) { handleAppError(error, setError); return }
           if (!data.success) throw new Error(data.error || 'Failed to list websites')
           result = data
           setState(prev => ({
@@ -1615,15 +1617,15 @@ print("Approved:", data["approved_count"])`
           if (additionalContext.trim()) {
             messageBody.additional_research = additionalContext.trim()
           }
-          const { data, error: fnError } = await supabase.functions.invoke('api-full-request', {
+          const { data, error } = await callEdgeFunction('api-full-request', {
             body: messageBody,
             headers: {
               'x-access-key': state.accessKey || '',
               'x-idempotency-key': crypto.randomUUID(),
               'x-user-id': state.userId || ''
             }
-          })
-          if (fnError) throw fnError
+          }, 'Generate message')
+          if (error) { handleAppError(error, setError); return }
           if (data?.status === 'processing') {
             throw new Error('Message is being generated. This takes about 1 minute. Please try again shortly.')
           }
@@ -1644,13 +1646,13 @@ print("Approved:", data["approved_count"])`
         case 13: {
           // Approve and send message
           if (!state.messageId) throw new Error('No message to approve. Generate a message first (Step 12).')
-          const { data, error: fnError } = await supabase.functions.invoke('message-approve', {
+          const { data, error } = await callEdgeFunction('message-approve', {
             body: { message_ids: [state.messageId] },
             headers: {
               'x-access-key': state.accessKey || ''
             }
-          })
-          if (fnError) throw fnError
+          }, 'Approve message')
+          if (error) { handleAppError(error, setError); return }
           if (!data.success) throw new Error(data.error || 'Failed to approve message')
           result = data
           setState(prev => ({

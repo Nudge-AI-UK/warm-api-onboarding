@@ -2,7 +2,7 @@ import { useState, useCallback, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { supabase } from '@/integrations/supabase/client'
+import { callEdgeFunction } from '@/lib/supabase/callEdgeFunction'
 import {
   CheckCircle2,
   Copy,
@@ -26,52 +26,37 @@ export default function IPIntelligencePage() {
     setLoading(true)
     setError(null)
 
-    try {
-      // Refresh session to ensure JWT is valid
-      const { data: refreshData } = await supabase.auth.refreshSession()
-      if (!refreshData.session) {
+    const { data, error: appError } = await callEdgeFunction('api-key-create', {
+      body: {
+        name: 'IP Intelligence Key',
+        aggregate_identify: true
+      }
+    }, 'Create API key')
+
+    if (appError) {
+      if (appError.kind === 'auth_required') {
         setError('Your session has expired. Please go back and sign in again.')
-        setLoading(false)
-        return
+      } else {
+        setError(appError.message)
       }
-
-      const { data, error: fnError } = await supabase.functions.invoke('api-key-create', {
-        body: {
-          name: 'IP Intelligence Key',
-          aggregate_identify: true
-        }
-      })
-
-      if (fnError) {
-        let errorMessage = fnError.message || 'Edge function error'
-        try {
-          if (fnError.context) {
-            const text = await fnError.context.text()
-            try {
-              const parsed = JSON.parse(text)
-              errorMessage = parsed.error || parsed.message || text
-            } catch {
-              errorMessage = text || errorMessage
-            }
-          }
-        } catch {}
-        throw new Error(errorMessage)
-      }
-      if (!data?.success) throw new Error(data?.error || 'Failed to create API key')
-
-      setApiKey(data.key)
-      setIsFirstKey(!!data.is_first_key)
-      setCreated(true)
-
-      // Store key ID in sessionStorage (not localStorage) for playground — cleared when tab closes
-      sessionStorage.setItem('warm-ip-api-key', data.key)
-      sessionStorage.setItem('warm-ip-api-key-id', data.id)
-    } catch (err: any) {
-      console.error('Failed to create API key:', err.message)
-      setError(err.message || 'Failed to create API key')
-    } finally {
       setLoading(false)
+      return
     }
+
+    if (!data?.success) {
+      setError(data?.error || 'Failed to create API key')
+      setLoading(false)
+      return
+    }
+
+    setApiKey(data.key)
+    setIsFirstKey(!!data.is_first_key)
+    setCreated(true)
+
+    // Store key ID in sessionStorage (not localStorage) for playground — cleared when tab closes
+    sessionStorage.setItem('warm-ip-api-key', data.key)
+    sessionStorage.setItem('warm-ip-api-key-id', data.id)
+    setLoading(false)
   }, [created, error])
 
   // Auto-create on first render
