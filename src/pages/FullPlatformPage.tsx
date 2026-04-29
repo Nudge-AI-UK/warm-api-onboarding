@@ -4814,12 +4814,12 @@ response = requests.post(
                   <div className="relative">
                     <pre className="bg-muted rounded-lg p-4 text-sm overflow-x-auto">
                       <code className="text-foreground">
-{`<script src="https://cdn.warmai.uk/warm.js" data-id="${state.trackingId || response?.website?.tracking_id || 'YOUR_TRACKING_ID'}" async></script>`}
+{`<script src="https://assets.warmai.uk/warm.js" data-id="${state.trackingId || response?.website?.tracking_id || 'YOUR_TRACKING_ID'}" async></script>`}
                       </code>
                     </pre>
                     <button
                       onClick={() => {
-                        navigator.clipboard.writeText(`<script src="https://cdn.warmai.uk/warm.js" data-id="${state.trackingId || response?.website?.tracking_id || 'YOUR_TRACKING_ID'}" async></script>`)
+                        navigator.clipboard.writeText(`<script src="https://assets.warmai.uk/warm.js" data-id="${state.trackingId || response?.website?.tracking_id || 'YOUR_TRACKING_ID'}" async></script>`)
                         setCopiedTrackingId(true)
                         setTimeout(() => setCopiedTrackingId(false), 2000)
                       }}
