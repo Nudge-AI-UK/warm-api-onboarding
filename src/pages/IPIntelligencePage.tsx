@@ -93,7 +93,7 @@ export default function IPIntelligencePage() {
             <h2 className="text-xl font-bold text-foreground mb-2">Something went wrong</h2>
             <p className="text-muted-foreground mb-4">{error}</p>
             <p className="text-xs text-muted-foreground mb-6">
-              If this keeps happening, contact <a href="mailto:support@warmai.uk" className="text-primary hover:underline">support@warmai.uk</a>
+              If this keeps happening, contact <a href="mailto:support@getwarmai.com" className="text-primary hover:underline">support@getwarmai.com</a>
             </p>
             <div className="flex gap-3 justify-center">
               <Button onClick={() => { setError(null); createApiKey() }} variant="outline">

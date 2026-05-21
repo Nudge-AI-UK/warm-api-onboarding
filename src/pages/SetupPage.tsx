@@ -185,7 +185,7 @@ export default function SetupPage() {
             <h1 className="text-lg font-semibold text-foreground mb-2">Setup Failed</h1>
             <p className="text-sm text-muted-foreground leading-relaxed">{error}</p>
             <a
-              href="mailto:support@warmai.uk"
+              href="mailto:support@getwarmai.com"
               className="inline-block mt-6 text-sm text-primary hover:underline"
             >
               Contact support
